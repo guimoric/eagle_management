@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Activities</h1><span class="tooltip-icon" data-tip="Manage and filter activities; export respects filters.">?</span>
+    </div>
+  </div>
+  {% if message %}<div class="alert success">Sucesso: {{ message }}</div>{% endif %}
+  {% if error %}<div class="alert error">Erro: {{ error }}</div>{% endif %}
+
+  <details class="panel">
+    <summary class="accordion-summary">New Activity</summary>
+    <form method="post" action="/activities" class="form-grid">
+      <input type="hidden" name="next_url" value="{{ next_url }}">
+      <label>Type
+        <select name="type_code" required>
+          {% for code, name in type_options %}
+            <option value="{{ code }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Subtype
+        <select name="subtype_code" required>
+          {% for code, name in subtype_options %}
+            <option value="{{ code }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Title<input type="text" name="title" required /></label>
+      <label>Status
+        <select name="status_code" required>
+          {% for code, name in status_options %}
+            <option value="{{ code }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Ticket code<input type="text" name="ticket_code" /></label>
+      <label>Assigned member
+        <select name="assigned_member_id">
+          <option value="">--</option>
+          {% for id, name in member_options %}
+            <option value="{{ id }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Project
+        <select name="project_id">
+          <option value="">--</option>
+          {% for id, code in project_options %}
+            <option value="{{ id }}">{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Target Release
+        <select name="target_release_id">
+          <option value="">--</option>
+          {% for id, code in release_options %}
+            <option value="{{ id }}">{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Start date<input type="date" name="start_date" /></label>
+      <div class="actions"><button type="submit">Save</button></div>
+    </form>
+  </details>
+
+  <details class="panel">
+    <summary class="accordion-summary">Filters</summary>
+    <form method="get" action="/activities" class="form-inline">
+      <label>Title
+        <input type="text" name="q" value="{{ filters.q if filters else '' }}" placeholder="Search by title" />
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="">All</option>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if filters and filters.status == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Project
+        <select name="project_id">
+          <option value="">--</option>
+          {% for id, code in project_options %}
+            <option value="{{ id }}" {% if filters and filters.project_id == id|string %}selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Assigned
+        <select name="assigned_member_id">
+          <option value="">--</option>
+          {% for id, name in member_options %}
+            <option value="{{ id }}" {% if filters and filters.assigned_member_id == id|string %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="actions-right">
+        <a class="btn secondary icon-btn" href="/activities/export?q={{ filters.q if filters else '' }}&status={{ filters.status if filters else '' }}&project_id={{ filters.project_id if filters else '' }}&assigned_member_id={{ filters.assigned_member_id if filters else '' }}" title="Export">&#11015;</a>
+        <button type="submit" class="icon-btn" title="Filter">&#128269;</button>
+      </div>
+    </form>
+  </details>
+
+  <div class="panel">
+    <h2>Lista</h2>
+    <table class="table">
+      <thead><tr><th>Title</th><th>Type/Subtype</th><th>Status</th><th>Project</th><th>Assigned</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for a in activities %}
+          <tr>
+            <td>{{ a.title }}</td>
+            <td>{{ a.type.name if a.type else a.type_code }} / {{ a.subtype.name if a.subtype else a.subtype_code }}</td>
+            <td>{{ a.status.name if a.status else a.status_code }}</td>
+            <td>{{ a.project.project_code if a.project else '-' }}</td>
+            <td>{{ a.assigned_member.name if a.assigned_member else '-' }}</td>
+            <td><a class="btn icon-btn" href="/activities/{{ a.id }}/edit" title="Edit">&#9998;</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6">No activities.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

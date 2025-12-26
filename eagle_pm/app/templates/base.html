@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title if title else "Eagle Planning" }}</title>
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Eagle Planning</div>
+    <nav class="nav">
+      <a href="/dashboards/daily-meeting">Daily Meeting</a>
+      <a href="/dashboards/project-control">Project Control</a>
+      <a href="/members">Members</a>
+      <a href="/releases">Releases</a>
+      <a href="/projects">Projects</a>
+      <a href="/activities">Activities</a>
+      <form method="post" action="/shutdown">
+        <button type="submit" class="btn danger nav-exit" title="Save & Exit">Exit</button>
+      </form>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

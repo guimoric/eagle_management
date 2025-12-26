@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Edit Activity</h1>
+  {% if error %}<div class="alert error">Error: {{ error }}</div>{% endif %}
+  <div class="panel">
+    <form method="post" action="/activities/{{ activity.id }}/edit" class="form-grid">
+      <input type="hidden" name="next_url" value="{{ next_url }}">
+      <label>Type
+        <select name="type_code" required>
+          {% for code, name in type_options %}
+            <option value="{{ code }}" {% if activity.type_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Subtype
+        <select name="subtype_code" required>
+          {% for code, name in subtype_options %}
+            <option value="{{ code }}" {% if activity.subtype_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Title<input type="text" name="title" value="{{ activity.title }}" required /></label>
+      <label>Status
+        <select name="status_code" required>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if activity.status_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Ticket code<input type="text" name="ticket_code" value="{{ activity.ticket_code or '' }}" /></label>
+      <label>Assigned member
+        <select name="assigned_member_id">
+          <option value="">--</option>
+          {% for id, name in member_options %}
+            <option value="{{ id }}" {% if activity.assigned_member_id == id %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Project
+        <select name="project_id">
+          <option value="">--</option>
+          {% for id, code in project_options %}
+            <option value="{{ id }}" {% if activity.project_id == id %}selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Target Release
+        <select name="target_release_id">
+          <option value="">--</option>
+          {% for id, code in release_options %}
+            <option value="{{ id }}" {% if activity.target_release_id == id %}selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Start date<input type="date" name="start_date" value="{{ activity.start_date }}" /></label>
+      <div class="actions">
+        <button type="submit">Save</button>
+        <a class="btn secondary" href="{{ next_url }}">Back</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

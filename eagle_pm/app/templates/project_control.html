@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Project Control</h1><span class="tooltip-icon" data-tip="Projects != CLOSED grouped by status; showing open activities.">?</span>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/projects">New Project</a>
+    </div>
+  </div>
+
+  {% for code, label in status_options %}
+    <details class="panel" open>
+      <summary class="accordion-summary">{{ label }}</summary>
+      <div class="vertical-list">
+        {% for p in projects_by_status.get(code, []) %}
+          <div class="vertical-item">
+            <div class="project-header">
+              <div>
+                <div class="item-title">{{ p.project_code }} — {{ p.title }}</div>
+                <div class="item-meta">PM: {{ p.pm_responsible }}</div>
+                <div class="item-meta">EBA: {{ p.eba_responsible }}</div>
+              </div>
+              <div class="project-actions">
+                <span class="status-badge">{{ p.status.name if p.status else p.status_code }}</span>
+                <a class="btn secondary" href="/projects/{{ p.id }}/edit">Editar projeto</a>
+              </div>
+            </div>
+            <div class="project-grid">
+              <div class="project-field">
+                <span class="label">Target Release</span>
+                <span class="value">{{ p.target_release.release_code if p.target_release else '-' }}</span>
+              </div>
+              <div class="project-field">
+                <span class="label">E2E Date</span>
+                <span class="value">{{ p.e2e_date if p.e2e_date else '-' }}</span>
+              </div>
+            </div>
+            <div class="item-meta">Activities abertas:</div>
+            <ul class="nested-list">
+              {% for a in activities if a.project_id == p.id and a.status_code != "005" %}
+                <li class="vertical-item">
+                  <div class="item-title"><a href="/activities/{{ a.id }}/edit">{{ a.title }}</a></div>
+                  <div class="item-meta">{{ a.type.name if a.type else a.type_code }} / {{ a.subtype.name if a.subtype else a.subtype_code }}</div>
+                  <div class="item-meta">Status: {{ a.status.name if a.status else a.status_code }}</div>
+                </li>
+              {% else %}
+                <li class="vertical-item muted">Sem activities abertas.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <div class="vertical-item muted">Nenhum projeto neste status.</div>
+        {% endfor %}
+      </div>
+    </details>
+  {% endfor %}
+{% endblock %}

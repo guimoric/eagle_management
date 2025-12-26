@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Members</h1><span class="tooltip-icon" data-tip="Manage members, status, vacations; export respects filters.">?</span>
+    </div>
+  </div>
+  {% if message %}
+    <div class="alert success">Sucesso: {{ message }}</div>
+  {% endif %}
+  {% if error %}
+    <div class="alert error">Erro: {{ error }}</div>
+  {% endif %}
+
+  <details class="panel">
+    <summary class="accordion-summary">New Member</summary>
+    <form method="post" action="/members" class="form-grid">
+      <label>
+        Name
+        <input type="text" name="name" value="{{ form_data.name if form_data else '' }}" required />
+      </label>
+      <label>
+        Role
+        <select name="role_code" required>
+          <option value="">Select</option>
+          {% for code, name in role_options %}
+            <option value="{{ code }}" {% if form_data and form_data.role_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Status
+        <select name="status_code" required>
+          <option value="">Select</option>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if form_data and form_data.status_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Vacation start
+        <input type="date" name="vacation_start" value="{{ form_data.vacation_start if form_data else '' }}" />
+      </label>
+      <label>
+        Vacation end
+        <input type="date" name="vacation_end" value="{{ form_data.vacation_end if form_data else '' }}" />
+      </label>
+      <div class="actions">
+        <button type="submit">Save</button>
+      </div>
+    </form>
+  </details>
+
+  <details class="panel">
+    <summary class="accordion-summary">Filters</summary>
+    <form method="get" action="/members" class="form-inline">
+      <label>
+        Search
+        <input type="text" name="q" value="{{ filters.q }}" placeholder="Name" />
+      </label>
+      <label>
+        Role
+        <select name="role">
+          <option value="">All</option>
+          {% for code, name in role_options %}
+            <option value="{{ code }}" {% if filters.role == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Status
+        <select name="status">
+          <option value="">All</option>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if filters.status == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="actions-right">
+        <a class="btn secondary icon-btn" title="Export" href="/members/export?q={{ filters.q }}&role={{ filters.role }}&status={{ filters.status }}">&#11015;</a>
+        <button type="submit" class="icon-btn" title="Filter">&#128269;</button>
+      </div>
+    </form>
+  </details>
+
+  <div class="panel">
+    <h2>Lista</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Vacation start</th>
+          <th>Vacation end</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in members %}
+          <tr>
+            <td>{{ m.name }}</td>
+            <td>{{ m.role.name if m.role else m.role_code }}</td>
+            <td>{{ m.status.name if m.status else m.status_code }}</td>
+            <td>{{ m.vacation_start if m.vacation_start else '-' }}</td>
+            <td>{{ m.vacation_end if m.vacation_end else '-' }}</td>
+            <td class="actions">
+              <a class="btn icon-btn" href="/members/{{ m.id }}/edit" title="Edit">&#9998;</a>
+              <form method="post" action="/members/{{ m.id }}/delete" class="inline">
+                <button class="icon-btn" type="submit" title="Delete" onclick="return confirm('Delete member?');">&#128465;</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4">Nenhum member encontrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

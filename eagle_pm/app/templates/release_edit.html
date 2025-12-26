@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Edit Release</h1>
+  {% if error %}<div class="alert error">Error: {{ error }}</div>{% endif %}
+  <div class="panel">
+    <p><strong>Code:</strong> {{ release.release_code }} | Status: {{ release.status.name if release.status else release.status_code }}</p>
+    {% if release.status_code == "003" %}
+      <div class="alert error">INSTALLED release is read-only.</div>
+    {% endif %}
+    <form method="post" action="/releases/{{ release.id }}/edit" class="form-grid">
+      <label>Delivery date<input type="date" name="delivery_date" value="{{ release.delivery_date }}" required {% if release.status_code == "003" %}disabled{% endif %}/></label>
+      <label>Start date<input type="date" name="start_date" value="{{ release.start_date }}" required {% if release.status_code == "003" %}disabled{% endif %}/></label>
+      <label>Installation date<input type="date" name="installation_date" value="{{ release.installation_date }}" required {% if release.status_code == "003" %}disabled{% endif %}/></label>
+      <div class="actions">
+        {% if release.status_code != "003" %}
+          <button type="submit">Salvar</button>
+        {% endif %}
+        <a class="btn secondary" href="/releases">Voltar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

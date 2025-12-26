@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eagle-planning"
+version = "0.1.0"
+description = "Eagle PM - offline/on-prem project management"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.109",
+    "uvicorn[standard]>=0.24",
+    "jinja2>=3.1",
+    "sqlalchemy>=2.0",
+    "pydantic>=2.6",
+    "python-multipart>=0.0.9",
+    "python-slugify>=8.0",
+    "typer>=0.9",
+    "openpyxl>=3.1",
+]
+
+[tool.uvicorn]
+factory = false
+reload = true
+port = 8000
+host = "127.0.0.1"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["eagle_pm*"]
+

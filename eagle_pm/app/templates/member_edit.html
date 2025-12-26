@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Editar Member</h1>
+  {% if error %}
+    <div class="alert error">Erro: {{ error }}</div>
+  {% endif %}
+  <div class="panel">
+    <form method="post" action="/members/{{ member.id }}/edit" class="form-grid">
+      <label>
+        Nome *
+        <input type="text" name="name" value="{{ member.name }}" required />
+      </label>
+      <label>
+        Papel *
+        <select name="role_code" required>
+          {% for code, name in role_options %}
+            <option value="{{ code }}" {% if member.role_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Status *
+        <select name="status_code" required>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if member.status_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Início férias
+        <input type="date" name="vacation_start" value="{{ member.vacation_start if member.vacation_start else '' }}" />
+      </label>
+      <label>
+        Fim férias
+        <input type="date" name="vacation_end" value="{{ member.vacation_end if member.vacation_end else '' }}" />
+      </label>
+      <div class="actions">
+        <button type="submit">Salvar</button>
+        <a class="btn secondary" href="/members">Cancelar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

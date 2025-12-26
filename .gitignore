@@ -1,0 +1,22 @@
+# Python / venv
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+*.spec
+
+# OS
+.DS_Store
+Thumbs.db

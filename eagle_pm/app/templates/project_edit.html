@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Edit Project</h1>
+  {% if error %}<div class="alert error">Error: {{ error }}</div>{% endif %}
+  <div class="panel">
+    <p><strong>{{ project.project_code }}</strong></p>
+    <form method="post" action="/projects/{{ project.id }}/edit" class="form-grid">
+      <label>Title<input type="text" name="title" value="{{ project.title }}" required /></label>
+      <label>PM Responsible<input type="text" name="pm_responsible" value="{{ project.pm_responsible }}" required /></label>
+      <label>EBA Responsible<input type="text" name="eba_responsible" value="{{ project.eba_responsible }}" required /></label>
+      <label>Status
+        <select name="status_code" required>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if project.status_code == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>E2E Date<input type="date" name="e2e_date" value="{{ project.e2e_date }}" /></label>
+      <label>Target Release
+        <select name="target_release_id">
+          <option value="">--</option>
+          {% for id, code in release_options %}
+            <option value="{{ id }}" {% if project.target_release_id == id %}selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="actions">
+        <button type="submit">Save</button>
+        <a class="btn secondary" href="/projects">Back</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

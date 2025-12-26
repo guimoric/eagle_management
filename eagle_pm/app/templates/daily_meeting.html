@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Daily Meeting</h1><span class="tooltip-icon" data-tip="List by member (including vacation) with activities != CLOSED; final section: Unassigned.">?</span>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/activities?next=/dashboards/daily-meeting">New Activity</a>
+    </div>
+  </div>
+
+  {% for m in members %}
+    <details class="panel" open>
+      <summary class="accordion-summary">
+        <strong>{{ m.name }}</strong>
+        {% set on_vacation = (m.vacation_start and m.vacation_end and m.vacation_start <= today <= m.vacation_end) or m.status_code == "002" %}
+        {% if on_vacation %}
+          <span class="badge badge-vacation">Vacation{% if m.vacation_end %} (returns {{ m.vacation_end }}){% endif %}</span>
+        {% endif %}
+        <span class="muted">• {{ m.role.name if m.role else m.role_code }}</span>
+      </summary>
+      <ul class="vertical-list">
+        {% for a in activities if a.assigned_member_id == m.id and a.status_code != "005" %}
+          <li class="vertical-item">
+            <div class="item-title"><a href="/activities/{{ a.id }}/edit?next=/dashboards/daily-meeting">{{ a.title }}</a></div>
+            <div class="item-meta">{{ a.type.name if a.type else a.type_code }} / {{ a.subtype.name if a.subtype else a.subtype_code }}</div>
+            <div class="item-meta">Status: {{ a.status.name if a.status else a.status_code }}</div>
+          </li>
+        {% else %}
+          <li class="vertical-item muted">Sem activities.</li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endfor %}
+
+  <details class="panel" open>
+    <summary class="accordion-summary"><strong>Unassigned</strong></summary>
+    <ul class="vertical-list">
+      {% for a in activities if not a.assigned_member_id and a.status_code != "005" %}
+        <li class="vertical-item">
+          <div class="item-title"><a href="/activities/{{ a.id }}/edit?next=/dashboards/daily-meeting">{{ a.title }}</a></div>
+          <div class="item-meta">{{ a.type.name if a.type else a.type_code }} / {{ a.subtype.name if a.subtype else a.subtype_code }}</div>
+          <div class="item-meta">Status: {{ a.status.name if a.status else a.status_code }}</div>
+        </li>
+      {% else %}
+        <li class="vertical-item muted">Sem activities.</li>
+      {% endfor %}
+    </ul>
+  </details>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Projects</h1><span class="tooltip-icon" data-tip="PR projects; target release cannot be INSTALLED; CLOSED drops from lists.">?</span>
+    </div>
+  </div>
+  {% if message %}<div class="alert success">Sucesso: {{ message }}</div>{% endif %}
+  {% if error %}<div class="alert error">Erro: {{ error }}</div>{% endif %}
+
+  <details class="panel">
+    <summary class="accordion-summary">New Project</summary>
+    <form method="post" action="/projects" class="form-grid">
+      <label>Project code<input type="text" name="project_code" placeholder="PR012345" required /></label>
+      <label>Title<input type="text" name="title" required /></label>
+      <label>PM Responsible<input type="text" name="pm_responsible" required /></label>
+      <label>EBA Responsible<input type="text" name="eba_responsible" required /></label>
+      <label>Status
+        <select name="status_code" required>
+          {% for code, name in status_options %}
+            <option value="{{ code }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>E2E Date<input type="date" name="e2e_date" /></label>
+      <label>Target Release
+        <select name="target_release_id">
+          <option value="">--</option>
+          {% for id, code in release_options %}
+            <option value="{{ id }}">{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="actions"><button type="submit">Save</button></div>
+    </form>
+  </details>
+
+  <details class="panel">
+    <summary class="accordion-summary">Filters</summary>
+    <form method="get" action="/projects" class="form-inline">
+      <label>Search code/title
+        <input type="text" name="q" value="{{ filters.q }}" />
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="">All</option>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if filters.status == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Target Release
+        <select name="target_release_id">
+          <option value="">All</option>
+          {% for id, code in release_options %}
+            <option value="{{ id }}" {% if filters.target_release_id == id|string %}selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="actions-right">
+        <a class="btn secondary icon-btn" href="/projects/export?q={{ filters.q }}&status={{ filters.status }}&target_release_id={{ filters.target_release_id }}" title="Export">&#11015;</a>
+        <button type="submit" class="icon-btn" title="Filter">&#128269;</button>
+      </div>
+    </form>
+  </details>
+
+  <div class="panel">
+    <h2>Lista</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Title</th>
+          <th>PM Responsible</th>
+          <th>EBA Responsible</th>
+          <th>Status</th>
+          <th>E2E Date</th>
+          <th>Target Release</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in projects %}
+          <tr>
+            <td>{{ p.project_code }}</td>
+            <td>{{ p.title }}</td>
+            <td>{{ p.pm_responsible }}</td>
+            <td>{{ p.eba_responsible }}</td>
+            <td>{{ p.status.name if p.status else p.status_code }}</td>
+            <td>{{ p.e2e_date if p.e2e_date else '-' }}</td>
+            <td>{{ p.target_release.release_code if p.target_release else '-' }}</td>
+            <td><a class="btn icon-btn" href="/projects/{{ p.id }}/edit" title="Edit">&#9998;</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8">No projects.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

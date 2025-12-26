@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Releases</h1><span class="tooltip-icon" data-tip="Manage releases; status auto by date; INSTALLED is read-only and not target.">?</span>
+    </div>
+  </div>
+  {% if message %}<div class="alert success">Sucesso: {{ message }}</div>{% endif %}
+  {% if error %}<div class="alert error">Erro: {{ error }}</div>{% endif %}
+
+  <details class="panel">
+    <summary class="accordion-summary">New Release</summary>
+    <form method="post" action="/releases" class="form-grid">
+      <label>Release code<input type="text" name="release_code" required /></label>
+      <label>Delivery date<input type="date" name="delivery_date" required /></label>
+      <label>Start date<input type="date" name="start_date" required /></label>
+      <label>Installation date<input type="date" name="installation_date" required /></label>
+      <div class="actions"><button type="submit">Save</button></div>
+    </form>
+  </details>
+
+  <details class="panel">
+    <summary class="accordion-summary">Filters</summary>
+    <form method="get" action="/releases" class="form-inline">
+      <label>Search code
+        <input type="text" name="q" value="{{ filters.q }}" placeholder="Release code" />
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="">All</option>
+          {% for code, name in status_options %}
+            <option value="{{ code }}" {% if filters.status == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="actions-right">
+        <a class="btn secondary icon-btn" href="/releases/export?q={{ filters.q }}&status={{ filters.status }}" title="Export">&#11015;</a>
+        <button type="submit" class="icon-btn" title="Filter">&#128269;</button>
+      </div>
+    </form>
+  </details>
+
+  <div class="panel">
+    <h2>Lista</h2>
+    <table class="table">
+      <thead><tr><th>Code</th><th>Status</th><th>Delivery</th><th>Start</th><th>Installation</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for r in releases %}
+          <tr>
+            <td>{{ r.release_code }}</td>
+            <td>{{ r.status.name if r.status else r.status_code }}</td>
+            <td>{{ r.delivery_date }}</td>
+            <td>{{ r.start_date }}</td>
+            <td>{{ r.installation_date }}</td>
+            <td>
+              {% if r.status_code != "003" %}
+                <a class="btn icon-btn" href="/releases/{{ r.id }}/edit" title="Edit">&#9998;</a>
+              {% else %}
+                <span class="muted">INSTALLED</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6">Nenhuma release.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
