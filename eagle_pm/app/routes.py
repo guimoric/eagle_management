@@ -19,6 +19,24 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 router = APIRouter()
 
 
+def fmt_date(value):
+    """Format date/datetime as DD/MM/YYYY or '-' when empty."""
+    if value in (None, "", "null"):
+        return "-"
+    try:
+        if isinstance(value, datetime):
+            return value.strftime("%d/%m/%Y")
+        if isinstance(value, date):
+            return value.strftime("%d/%m/%Y")
+        # Attempt ISO parsing
+        return datetime.fromisoformat(str(value)).strftime("%d/%m/%Y")
+    except Exception:
+        return str(value)
+
+
+templates.env.filters["fmt_date"] = fmt_date
+
+
 def _parse_date(value: str | None, field_name: str) -> date | None:
     if value is None or value == "":
         return None

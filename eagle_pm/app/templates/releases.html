@@ -49,9 +49,9 @@
           <tr>
             <td>{{ r.release_code }}</td>
             <td>{{ r.status.name if r.status else r.status_code }}</td>
-            <td>{{ r.delivery_date }}</td>
-            <td>{{ r.start_date }}</td>
-            <td>{{ r.installation_date }}</td>
+            <td>{{ r.delivery_date | fmt_date }}</td>
+            <td>{{ r.start_date | fmt_date }}</td>
+            <td>{{ r.installation_date | fmt_date }}</td>
             <td>
               {% if r.status_code != "003" %}
                 <a class="btn icon-btn" href="/releases/{{ r.id }}/edit" title="Edit">&#9998;</a>

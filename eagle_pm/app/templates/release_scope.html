@@ -17,15 +17,15 @@
       <div class="release-meta">
         <div class="meta-block">
           <span class="label">Delivery</span>
-          <span class="value">{{ current_release.delivery_date }}</span>
+          <span class="value">{{ current_release.delivery_date | fmt_date }}</span>
         </div>
         <div class="meta-block">
           <span class="label">Start</span>
-          <span class="value">{{ current_release.start_date }}</span>
+          <span class="value">{{ current_release.start_date | fmt_date }}</span>
         </div>
         <div class="meta-block">
           <span class="label">Installation</span>
-          <span class="value">{{ current_release.installation_date }}</span>
+          <span class="value">{{ current_release.installation_date | fmt_date }}</span>
         </div>
       </div>
     </div>

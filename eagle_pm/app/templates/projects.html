@@ -87,7 +87,7 @@
             <td>{{ p.pm_responsible }}</td>
             <td>{{ p.eba_responsible }}</td>
             <td>{{ p.status.name if p.status else p.status_code }}</td>
-            <td>{{ p.e2e_date if p.e2e_date else '-' }}</td>
+            <td>{{ p.e2e_date | fmt_date }}</td>
             <td>{{ p.target_release.release_code if p.target_release else '-' }}</td>
             <td><a class="btn icon-btn" href="/projects/{{ p.id }}/edit" title="Edit">&#9998;</a></td>
           </tr>
