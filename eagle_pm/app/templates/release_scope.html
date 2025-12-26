@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="header-row">
+    <div class="actions">
+      <h1>Release Scope</h1><span class="tooltip-icon" data-tip="Open activities linked to the current (non-installed) release.">?</span>
+    </div>
+  </div>
+
+  {% if not current_release %}
+    <div class="panel"><p>No active/planned release found.</p></div>
+  {% else %}
+    <div class="panel">
+      <div class="section-header">
+        <div class="item-title">{{ current_release.release_code }}</div>
+        <div class="item-meta">Status: {{ current_release.status.name if current_release.status else current_release.status_code }}</div>
+        <div class="item-meta">Delivery: {{ current_release.delivery_date }} | Start: {{ current_release.start_date }} | Installation: {{ current_release.installation_date }}</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Activities in this release</h2>
+      <ul class="vertical-list">
+        {% for a in activities %}
+          <li class="vertical-item">
+            <div class="item-title"><a href="/activities/{{ a.id }}/edit">{{ a.title }}</a></div>
+            <div class="item-meta">Type/Subtype: {{ a.type.name if a.type else a.type_code }} / {{ a.subtype.name if a.subtype else a.subtype_code }}</div>
+            <div class="item-meta">Status: {{ a.status.name if a.status else a.status_code }}</div>
+            <div class="item-meta">Project: {{ a.project.project_code if a.project else '-' }} | Assigned: {{ a.assigned_member.name if a.assigned_member else '-' }}</div>
+          </li>
+        {% else %}
+          <li class="vertical-item muted">No open activities for this release.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endblock %}
