@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+import os
 import subprocess
 import threading
-import os
 from pathlib import Path
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, Response
@@ -15,7 +15,6 @@ from . import crud, models, rules, export as export_utils
 from .db import get_session
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
-ROOT_DIR = Path(__file__).resolve().parents[2]
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 router = APIRouter()
 
@@ -39,21 +38,37 @@ def health():
     return {"status": "ok"}
 
 
+def _git_root_from_env_or_tree() -> Path | None:
+    env_root = os.getenv("EAGLE_GIT_ROOT")
+    if env_root:
+        p = Path(env_root)
+        if (p / ".git").exists():
+            return p
+    current = Path(__file__).resolve()
+    for parent in [current] + list(current.parents):
+        if (parent / ".git").exists():
+            return parent
+    return None
+
+
 def _run_git_commit_push() -> str:
     """Run git add/commit/push with timestamp message; return status text."""
+    git_root = _git_root_from_env_or_tree()
+    if not git_root:
+        return "No git repository found; skipping commit/push."
     now_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
     try:
         status_result = subprocess.run(
-            ["git", "-C", str(ROOT_DIR), "status", "--porcelain"],
+            ["git", "-C", str(git_root), "status", "--porcelain"],
             capture_output=True,
             text=True,
             check=False,
         )
         if not status_result.stdout.strip():
             return "No changes to commit."
-        subprocess.run(["git", "-C", str(ROOT_DIR), "add", "."], check=True)
-        subprocess.run(["git", "-C", str(ROOT_DIR), "commit", "-m", now_str], check=True)
-        subprocess.run(["git", "-C", str(ROOT_DIR), "push"], check=True)
+        subprocess.run(["git", "-C", str(git_root), "add", "."], check=True)
+        subprocess.run(["git", "-C", str(git_root), "commit", "-m", now_str], check=True)
+        subprocess.run(["git", "-C", str(git_root), "push"], check=True)
         return f"Committed and pushed at {now_str}."
     except subprocess.CalledProcessError as exc:
         return f"Git operation failed: {exc}"
@@ -134,6 +149,60 @@ def project_control(request: Request, session: Session = Depends(get_session)):
             "title": "Project Control",
             "status_options": status_options,
             "projects_by_status": projects_by_status,
+            "activities": activities,
+        },
+    )
+
+
+@router.get("/dashboards/release-scope")
+def release_scope(request: Request, session: Session = Depends(get_session)):
+    crud.update_release_statuses(session)
+    current_release = session.execute(
+        select(models.Release)
+        .where(models.Release.status_code != rules.STATUS_RELEASE_INSTALLED)
+        .order_by(models.Release.start_date)
+    ).scalars().first()
+    activities = []
+    if current_release:
+        activities = session.execute(
+            select(models.Activity)
+            .where(models.Activity.target_release_id == current_release.id)
+            .where(models.Activity.status_code != rules.STATUS_ACTIVITY_CLOSED)
+            .order_by(models.Activity.created_at.desc())
+        ).scalars().all()
+    return templates.TemplateResponse(
+        "release_scope.html",
+        {
+            "request": request,
+            "title": "Release Scope",
+            "current_release": current_release,
+            "activities": activities,
+        },
+    )
+
+
+@router.get("/dashboards/release-scope")
+def release_scope(request: Request, session: Session = Depends(get_session)):
+    crud.update_release_statuses(session)
+    current_release = session.execute(
+        select(models.Release)
+        .where(models.Release.status_code != rules.STATUS_RELEASE_INSTALLED)
+        .order_by(models.Release.start_date)
+    ).scalars().first()
+    activities = []
+    if current_release:
+        activities = session.execute(
+            select(models.Activity)
+            .where(models.Activity.target_release_id == current_release.id)
+            .where(models.Activity.status_code != rules.STATUS_ACTIVITY_CLOSED)
+            .order_by(models.Activity.created_at.desc())
+        ).scalars().all()
+    return templates.TemplateResponse(
+        "release_scope.html",
+        {
+            "request": request,
+            "title": "Release Scope",
+            "current_release": current_release,
             "activities": activities,
         },
     )
