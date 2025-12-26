@@ -102,8 +102,8 @@
             <td>{{ m.name }}</td>
             <td>{{ m.role.name if m.role else m.role_code }}</td>
             <td>{{ m.status.name if m.status else m.status_code }}</td>
-            <td>{{ m.vacation_start if m.vacation_start else '-' }}</td>
-            <td>{{ m.vacation_end if m.vacation_end else '-' }}</td>
+            <td>{{ m.vacation_start | fmt_date }}</td>
+            <td>{{ m.vacation_end | fmt_date }}</td>
             <td class="actions">
               <a class="btn icon-btn" href="/members/{{ m.id }}/edit" title="Edit">&#9998;</a>
               <form method="post" action="/members/{{ m.id }}/delete" class="inline">

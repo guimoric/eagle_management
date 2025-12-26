@@ -20,6 +20,7 @@
                 <div class="item-title">{{ p.project_code }} — {{ p.title }}</div>
                 <div class="item-meta">PM: {{ p.pm_responsible }}</div>
                 <div class="item-meta">EBA: {{ p.eba_responsible }}</div>
+                <div class="item-meta">E2E: {{ p.e2e_date | fmt_date }}</div>
               </div>
               <div class="project-actions">
                 <span class="status-badge">{{ p.status.name if p.status else p.status_code }}</span>
@@ -43,6 +44,7 @@
                   <div class="item-title"><a href="/activities/{{ a.id }}/edit">{{ a.title }}</a></div>
                   <div class="item-meta">{{ a.type.name if a.type else a.type_code }} / {{ a.subtype.name if a.subtype else a.subtype_code }}</div>
                   <div class="item-meta">Status: {{ a.status.name if a.status else a.status_code }}</div>
+                  <div class="item-meta">Start: {{ a.start_date | fmt_date }}</div>
                 </li>
               {% else %}
                 <li class="vertical-item muted">Sem activities abertas.</li>
