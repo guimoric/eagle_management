@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: eagle-planning
+Version: 0.1.0
+Summary: Eagle PM - offline/on-prem project management
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.109
+Requires-Dist: uvicorn[standard]>=0.24
+Requires-Dist: jinja2>=3.1
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: pydantic>=2.6
+Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: python-slugify>=8.0
+Requires-Dist: typer>=0.9
+Requires-Dist: openpyxl>=3.1
+
+﻿# Eagle PM
+
+Web app offline/on-prem (FastAPI + Jinja2/HTMX + SQLite) para gestão de members, releases, projects e activities, com dashboards Daily Meeting e Project Control.
+
+## Rodar em dev
+```
+python -m venv .venv
+. .venv/Scripts/activate  # Windows
+pip install -e .
+uvicorn eagle_pm.app.main:app --reload
+```
+
+## Empacotar (PyInstaller)
+- script: `scripts/build_exe.ps1` (a criar)
