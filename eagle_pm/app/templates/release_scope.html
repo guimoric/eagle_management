@@ -2,23 +2,39 @@
 {% block content %}
   <div class="header-row">
     <div class="actions">
-      <h1>Release Scope</h1><span class="tooltip-icon" data-tip="Open activities linked to the current (non-installed) release.">?</span>
+      <h1>Release Management</h1><span class="tooltip-icon" data-tip="Open activities for the current (non-installed) release.">?</span>
     </div>
   </div>
 
   {% if not current_release %}
     <div class="panel"><p>No active/planned release found.</p></div>
   {% else %}
-    <div class="panel">
-      <div class="section-header">
-        <div class="item-title">{{ current_release.release_code }}</div>
-        <div class="item-meta">Status: {{ current_release.status.name if current_release.status else current_release.status_code }}</div>
-        <div class="item-meta">Delivery: {{ current_release.delivery_date }} | Start: {{ current_release.start_date }} | Installation: {{ current_release.installation_date }}</div>
+    <div class="panel release-card">
+      <div class="release-header">
+        <div class="release-code">{{ current_release.release_code }}</div>
+        <div class="status-pill">{{ current_release.status.name if current_release.status else current_release.status_code }}</div>
+      </div>
+      <div class="release-meta">
+        <div class="meta-block">
+          <span class="label">Delivery</span>
+          <span class="value">{{ current_release.delivery_date }}</span>
+        </div>
+        <div class="meta-block">
+          <span class="label">Start</span>
+          <span class="value">{{ current_release.start_date }}</span>
+        </div>
+        <div class="meta-block">
+          <span class="label">Installation</span>
+          <span class="value">{{ current_release.installation_date }}</span>
+        </div>
       </div>
     </div>
 
     <div class="panel">
-      <h2>Activities in this release</h2>
+      <div class="section-header">
+        <h2>Activities</h2>
+        <div class="muted">Open items targeting {{ current_release.release_code }}</div>
+      </div>
       <ul class="vertical-list">
         {% for a in activities %}
           <li class="vertical-item">
